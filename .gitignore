@@ -1,1 +1,9 @@
-StockPriceProducer.py
+environ.py
+CommentOutput.avro
+StockPriceOutput.avro
+StockPriceProducer.ipynb
+SubmissionOutput.avro
+.env
+test.py
+Producers/__pycache__/CommentSubmissionProducer.cpython-311.pyc
+Producers/__pycache__/StockPriceProducer.cpython-311.pyc
