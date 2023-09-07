@@ -1,19 +1,25 @@
-import websocket
 import json
 import os
+import io
+import websocket
 import avro.schema
 from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
+from kafka import *
 
 class StockPriceProducer:
 
     def __init__(self):
 
-        websocket.enableTrace(True)
+        self.producer = KafkaProducer(bootstrap_servers=['localhost:9092'],  api_version=(0,10,2))
+        self.KafkaTopic = 'stockPrices'
+
         self.StockPriceOutput = DataFileWriter(
             open("StockPriceOutput.avro", "wb"), 
             DatumWriter(), 
             avro.schema.parse(open("./Schemas/StockPriceSchema.avsc", "rb").read()))
+        
+        websocket.enableTrace(True)
         self.ws = websocket.WebSocketApp("wss://ws.finnhub.io?token="+os.getenv("FINNHUB_TOKEN"),
                                     on_message = self.on_message,
                                     on_error = self.on_error,
@@ -29,6 +35,13 @@ class StockPriceProducer:
         
         if message_json['type'] == "trade":
             self.StockPriceOutput.append(message_json)
+
+            with open("./Schemas/StockPriceSchema.avsc", "rb") as schema_file:
+                schema = avro.schema.parse(schema_file.read())
+            byteStream = io.BytesIO()
+            encoder = avro.io.BinaryEncoder(byteStream)
+            avro.io.DatumWriter(schema).write(message_json, encoder)
+            self.producer.send(self.KafkaTopic, byteStream.getvalue())
 
 
     def on_error(self, ws, error):
