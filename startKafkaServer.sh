@@ -21,6 +21,8 @@ KAFKA_CLUSTER_ID="$(./kafka_2.12-3.5.1/bin/kafka-storage.sh random-uuid)"
 
 # # start consumer
 # ./kafka_2.12-3.5.1/bin/kafka-console-consumer.sh --topic stockPrices --from-beginning --bootstrap-server localhost:9092
+# ./kafka_2.12-3.5.1/bin/kafka-console-consumer.sh --topic redditSubmissions --from-beginning --bootstrap-server localhost:9092
+# ./kafka_2.12-3.5.1/bin/kafka-console-consumer.sh --topic redditComments --from-beginning --bootstrap-server localhost:9092
 
 # # delete topic
 # ./kafka_2.12-3.5.1/bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic stockPrices

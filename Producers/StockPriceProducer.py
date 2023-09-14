@@ -15,10 +15,13 @@ class StockPriceProducer:
         self.producer = KafkaProducer(bootstrap_servers=['localhost:9092'],  api_version=(0,10,2))
         self.KafkaTopic = 'stockPrices'
 
+        with open("./Schemas/StockPriceSchema.avsc", "rb") as schema_file:
+            self.schema = avro.schema.parse(schema_file.read())
+
         self.StockPriceOutput = DataFileWriter(
             open("StockPriceOutput.avro", "wb"), 
             DatumWriter(), 
-            avro.schema.parse(open("./Schemas/StockPriceSchema.avsc", "rb").read()))
+            self.schema)
         
         websocket.enableTrace(True)
         self.ws = websocket.WebSocketApp("wss://ws.finnhub.io?token="+os.getenv("FINNHUB_TOKEN"),
@@ -38,11 +41,10 @@ class StockPriceProducer:
             for singleRecord in message_json['data']:
                 self.StockPriceOutput.append(singleRecord)
 
-                with open("./Schemas/StockPriceSchema.avsc", "rb") as schema_file:
-                    schema = avro.schema.parse(schema_file.read())
+
                 byteStream = io.BytesIO()
                 encoder = avro.io.BinaryEncoder(byteStream)
-                avro.io.DatumWriter(schema).write(singleRecord, encoder)
+                avro.io.DatumWriter(self.schema).write(singleRecord, encoder)
 
                 allowedKeyChars = r'[^a-zA-Z0-9\._\-]'
                 

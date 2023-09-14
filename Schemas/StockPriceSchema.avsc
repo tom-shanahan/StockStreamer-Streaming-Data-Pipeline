@@ -2,38 +2,23 @@
 	"type": "record",
 	"namespace": "StockPriceProducer",
 	"name": "message",
-		"fields": [ 
-			{
-				"name": "data",
-				"type": {
+	"fields": [
+		{
+			"name": "c",
+			"type": [
+				{
 					"type": "array",
-					"items": {
-						"type": "record",
-						"name": "TradeData",
-						"fields": [
-							{
-								"name": "c",
-								"type": [
-									{
-										"type": "array",
-										"items": ["null","string"],
-										"default": []
-									},
-									"null"
-								],
-								"doc": "List of trade conditions"
-							}, 
-							{"name": "p", "type": "double", "doc": "Last trade price"}, 
-							{"name": "s", "type": "string", "doc": "Stock Symbol"}, 
-							{"name": "t", "type": "long", 	"doc": "UNIX milliseconds timestamp"}, 
-							{"name": "v", "type": "double", "doc": "Trade volume"} 
-						]
-					},
-					"doc":  "Trade data"
+					"items": ["null","string"],
+					"default": []
 				},
-				"doc": "Message data"
-			}, 
-			{"name": "type", "type": "string", "doc":  "Message type"} 
-		],
-		"doc": "Finnhub message schema"
+				"null"
+			],
+			"doc": "List of trade conditions"
+		}, 
+		{"name": "p", "type": "double", "doc": "Last trade price"}, 
+		{"name": "s", "type": "string", "doc": "Stock Symbol"}, 
+		{"name": "t", "type": "long", 	"doc": "UNIX milliseconds timestamp"}, 
+		{"name": "v", "type": "double", "doc": "Trade volume"} 
+	],
+	"doc": "Finnhub single record message schema"
 }

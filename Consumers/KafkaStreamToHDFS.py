@@ -16,7 +16,7 @@ from pyspark.sql.functions import col
 spark = SparkSession.builder.appName("KafkaStreamToRDD").getOrCreate()
 
 kafka_topics_schemas = {
-    "stockPrices": "/home/tshanahan/StockStreamer/Schemas/StockPriceSchema.avsc",
+    # "stockPrices": "/home/tshanahan/StockStreamer/Schemas/StockPriceSchema.avsc",
     "redditComments": "/home/tshanahan/StockStreamer/Schemas/CommentSchema.avsc",
     "redditSubmissions": "/home/tshanahan/StockStreamer/Schemas/SubmissionSchema.avsc"
 }
