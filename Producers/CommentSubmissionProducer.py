@@ -19,15 +19,15 @@ class CommentSubmissionProducer:
         with open("./Schemas/SubmissionSchema.avsc", "rb") as schema_file:
             self.SubmissionSchema = avro.schema.parse(schema_file.read())
 
-        self.CommentOutput = DataFileWriter(
-            open("CommentOutput.avro", "wb"), 
-            DatumWriter(), 
-            self.CommentSchema)
+        # self.CommentOutput = DataFileWriter(
+        #     open("CommentOutput.avro", "wb"), 
+        #     DatumWriter(), 
+        #     self.CommentSchema)
         
-        self.SubmissionOutput = DataFileWriter(
-            open("SubmissionOutput.avro", "wb"), 
-            DatumWriter(), 
-            self.SubmissionSchema)
+        # self.SubmissionOutput = DataFileWriter(
+        #     open("SubmissionOutput.avro", "wb"), 
+        #     DatumWriter(), 
+        #     self.SubmissionSchema)
 
         self.reddit = praw.Reddit(
             "bot1", user_agent="bot1 user agent"
@@ -55,7 +55,7 @@ class CommentSubmissionProducer:
                             "title": submission.title,
                             "id": submission.id,
                             "selftext": submission.selftext,
-                            "subreddit": submission.subreddit.name,
+                            "subreddit": str(submission.subreddit),
                             "upvote_ratio": submission.upvote_ratio,
                             "num_comments": submission.num_comments,
                             "score": submission.score,
@@ -67,10 +67,10 @@ class CommentSubmissionProducer:
                         avro.io.DatumWriter(self.SubmissionSchema).write(SubmissionData, encoder)
 
                         self.producer.send(topic = self.KafkaTopicSubmissions, 
-                            key = submission.subreddit.name.encode('utf-8'), 
+                            key = str(submission.subreddit).encode('utf-8'), 
                             value = byteStream.getvalue())
 
-                        self.SubmissionOutput.append(SubmissionData)
+                        # self.SubmissionOutput.append(SubmissionData)
                     
                 for comment in self.comment_stream:
                     if comment is None:
@@ -80,7 +80,7 @@ class CommentSubmissionProducer:
                         CommentData = {
                             "body": comment.body,
                             "created_utc": int(comment.created_utc), 
-                            "subreddit": comment.subreddit.name, 
+                            "subreddit": str(comment.subreddit), 
                             "submissionID": comment.submission.id, 
                             "submissionTitle": comment.submission.title, 
                             "submissionSelfText": comment.submission.selftext, 
@@ -92,21 +92,21 @@ class CommentSubmissionProducer:
                         avro.io.DatumWriter(self.CommentSchema).write(CommentData, encoder)
 
                         self.producer.send(topic = self.KafkaTopicComments, 
-                            key = comment.subreddit.name.encode('utf-8'), 
+                            key = str(comment.subreddit).encode('utf-8'), 
                             value = byteStream.getvalue())
 
-                        self.CommentOutput.append(CommentData)
+                        # self.CommentOutput.append(CommentData)
                                 
             except BaseException as e:
-                self.SubmissionOutput.close()
-                self.CommentOutput.close()
+                # self.SubmissionOutput.close()
+                # self.CommentOutput.close()
                 print("Exception")
                 print(str(e))
                 # self.subreddit = self.reddit.subreddit("+".join(str(x) for x in subreddit_list))
                 # self.comment_stream = self.subreddit.stream.comments(pause_after=-1, skip_existing=True)
                 # self.submission_stream = self.subreddit.stream.submissions(pause_after=-1, skip_existing=True)
 
-        self.SubmissionOutput.close()
-        self.CommentOutput.close()
+        # self.SubmissionOutput.close()
+        # self.CommentOutput.close()
         
 
