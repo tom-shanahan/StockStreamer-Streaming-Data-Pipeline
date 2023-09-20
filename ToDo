@@ -1,0 +1,16 @@
+- read parquet output - done
+- stream2hdfs to class - done
+- create spark batch analysis
+    - list of companies, symbols
+    - identify stocks referenced
+    - sentiment analysis of comment
+    - https://github.com/asad70/reddit-sentiment-analysis
+- dockerize
+- check spark warns
+
+
+Optional:
+- remove PRAW, write own code
+https://github.com/praw-dev/asyncpraw/blob/master/asyncpraw/models/util.py#L59
+https://www.reddit.com/r/redditdev/comments/14x3q9w/getting_429_every_10_minutes_when_streaming_four/
+

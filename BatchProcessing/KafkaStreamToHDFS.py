@@ -51,4 +51,3 @@ class KafkaStreamToHDFS:
             .foreachBatch(writeTopic) \
             .start() \
             .awaitTermination()
-

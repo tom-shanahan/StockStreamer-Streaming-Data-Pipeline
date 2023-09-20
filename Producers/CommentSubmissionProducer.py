@@ -30,7 +30,7 @@ class CommentSubmissionProducer:
         #     self.SubmissionSchema)
 
         self.reddit = praw.Reddit(
-            "bot1", user_agent="bot1 user agent"
+            "RedditCredentials1", user_agent="windows:MyFinanceApp:v0.0.1 (by /u/Good-Department-2398)"
             # client_id=os.getenv("REDDIT_CLIENT_ID"),
             # client_secret=os.getenv("REDDIT_CLIENT_SECRETS"),
             # user_agent=os.getenv("REDDIT_USER_AGENT")
