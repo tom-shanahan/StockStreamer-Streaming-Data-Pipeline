@@ -1,7 +1,7 @@
 import json
 import os
 import io
-import re
+import pandas as pd
 import websocket
 import avro.schema
 from avro.datafile import DataFileWriter
@@ -22,6 +22,8 @@ class StockPriceProducer:
             open("StockPriceOutput.avro", "wb"), 
             DatumWriter(), 
             self.schema)
+        
+        self.streamingTickers = pd.read_csv("BatchProcessing/SteamingTickers.csv").stack().tolist()
         
         websocket.enableTrace(True)
         self.ws = websocket.WebSocketApp("wss://ws.finnhub.io?token="+os.getenv("FINNHUB_TOKEN"),
@@ -45,12 +47,9 @@ class StockPriceProducer:
                 byteStream = io.BytesIO()
                 encoder = avro.io.BinaryEncoder(byteStream)
                 avro.io.DatumWriter(self.schema).write(singleRecord, encoder)
-
-                allowedKeyChars = r'[^a-zA-Z0-9\._\-]'
                 
                 self.producer.send(topic = self.KafkaTopic, 
-                                #    key = re.sub(allowedKeyChars, '', singleRecord['s']).encode('utf-8'), 
-                                    key = singleRecord['s'].encode('utf-8'), 
+                                   key = singleRecord['s'].encode('utf-8'), 
                                    value = byteStream.getvalue())
 
 
@@ -68,11 +67,9 @@ class StockPriceProducer:
 
         
     def on_open(self, ws):
-        self.ws.send('{"type":"subscribe","symbol":"AMZN"}')
-        self.ws.send('{"type":"subscribe","symbol":"GOOG"}')
-        self.ws.send('{"type":"subscribe","symbol":"TSLA"}')
-        self.ws.send('{"type":"subscribe","symbol":"MSFT"}')
-        self.ws.send('{"type":"subscribe","symbol":"NVDA"}')
-        self.ws.send('{"type":"subscribe","symbol":"AAPL"}')
-        self.ws.send('{"type":"subscribe","symbol":"META"}')
-        self.ws.send('{"type":"subscribe","symbol":"BINANCE:BTCUSDT"}')
+        for sym in self.streamingTickers:
+            self.ws.send('{"type":"subscribe","symbol":"'+sym+'"}')
+
+
+if __name__ == "__main__":
+    Stock_Price_Producer = StockPriceProducer()

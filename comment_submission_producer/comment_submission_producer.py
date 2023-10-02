@@ -1,9 +1,13 @@
 import io
 import praw
 import avro.schema
-from avro.datafile import DataFileWriter
-from avro.io import DatumWriter
+# from avro.datafile import DataFileWriter
+# from avro.io import DatumWriter
 from kafka import *
+
+subreddit_list = ['stocks','wallstreetbets','investing','StockMarket',
+                  'traders','ValueInvesting','StockMarket','finance',
+                  'Daytrading','dividends','trading']
 
 class CommentSubmissionProducer:
 
@@ -13,10 +17,10 @@ class CommentSubmissionProducer:
         self.KafkaTopicSubmissions = "redditSubmissions"
         self.KafkaTopicComments = "redditComments"
 
-        with open("./Schemas/CommentSchema.avsc", "rb") as schema_file:
+        with open("./CommentSchema.avsc", "rb") as schema_file:
             self.CommentSchema = avro.schema.parse(schema_file.read())
 
-        with open("./Schemas/SubmissionSchema.avsc", "rb") as schema_file:
+        with open("./SubmissionSchema.avsc", "rb") as schema_file:
             self.SubmissionSchema = avro.schema.parse(schema_file.read())
 
         # self.CommentOutput = DataFileWriter(
@@ -30,10 +34,7 @@ class CommentSubmissionProducer:
         #     self.SubmissionSchema)
 
         self.reddit = praw.Reddit(
-            "RedditCredentials1", user_agent="windows:MyFinanceApp:v0.0.1 (by /u/Good-Department-2398)"
-            # client_id=os.getenv("REDDIT_CLIENT_ID"),
-            # client_secret=os.getenv("REDDIT_CLIENT_SECRETS"),
-            # user_agent=os.getenv("REDDIT_USER_AGENT")
+            "RedditCredentials1"
         )
         self.subreddit_list = subreddit_list
         self.subreddit = self.reddit.subreddit("+".join(str(x) for x in self.subreddit_list))
@@ -110,3 +111,5 @@ class CommentSubmissionProducer:
         # self.CommentOutput.close()
         
 
+if __name__ == "__main__":
+    Comment_Submission_Producer = CommentSubmissionProducer(subreddit_list)
