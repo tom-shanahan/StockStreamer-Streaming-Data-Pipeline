@@ -7,6 +7,7 @@ import avro.schema
 from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
 from kafka import *
+import configparser
 
 class StockPriceProducer:
 
@@ -15,7 +16,7 @@ class StockPriceProducer:
         self.producer = KafkaProducer(bootstrap_servers=['localhost:9092'],  api_version=(0,10,2))
         self.KafkaTopic = 'stockPrices'
 
-        with open("./Schemas/StockPriceSchema.avsc", "rb") as schema_file:
+        with open("stock_price_producer/StockPriceSchema.avsc", "rb") as schema_file:
             self.schema = avro.schema.parse(schema_file.read())
 
         self.StockPriceOutput = DataFileWriter(
@@ -23,10 +24,14 @@ class StockPriceProducer:
             DatumWriter(), 
             self.schema)
         
-        self.streamingTickers = pd.read_csv("BatchProcessing/SteamingTickers.csv").stack().tolist()
+        self.streamingTickers = pd.read_csv("BatchProcessing/StreamingTickers.csv").stack().tolist()
         
+        self.config = configparser.ConfigParser()
+        self.config.read("secrets/credentials.ini")
+        FINNHUB_TOKEN = self.config.get('FINNHUB', 'FINNHUB_TOKEN')
+
         websocket.enableTrace(True)
-        self.ws = websocket.WebSocketApp("wss://ws.finnhub.io?token="+os.getenv("FINNHUB_TOKEN"),
+        self.ws = websocket.WebSocketApp("wss://ws.finnhub.io?token="+FINNHUB_TOKEN,
                                     on_message = self.on_message,
                                     on_error = self.on_error,
                                     on_close = self.on_close)
@@ -67,6 +72,7 @@ class StockPriceProducer:
 
         
     def on_open(self, ws):
+        # self.ws.send('{"type":"subscribe","symbol":"BINANCE:BTCUSDT"}') # high volume data (helpful for testing outside of market hours)
         for sym in self.streamingTickers:
             self.ws.send('{"type":"subscribe","symbol":"'+sym+'"}')
 

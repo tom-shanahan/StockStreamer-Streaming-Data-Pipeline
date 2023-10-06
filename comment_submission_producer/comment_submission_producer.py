@@ -2,8 +2,9 @@ import io
 import praw
 import avro.schema
 # from avro.datafile import DataFileWriter
-# from avro.io import DatumWriter
+from avro.io import DatumWriter, BinaryEncoder
 from kafka import *
+import configparser
 
 subreddit_list = ['stocks','wallstreetbets','investing','StockMarket',
                   'traders','ValueInvesting','StockMarket','finance',
@@ -17,10 +18,10 @@ class CommentSubmissionProducer:
         self.KafkaTopicSubmissions = "redditSubmissions"
         self.KafkaTopicComments = "redditComments"
 
-        with open("./CommentSchema.avsc", "rb") as schema_file:
+        with open("comment_submission_producer/CommentSchema.avsc", "rb") as schema_file:
             self.CommentSchema = avro.schema.parse(schema_file.read())
 
-        with open("./SubmissionSchema.avsc", "rb") as schema_file:
+        with open("comment_submission_producer/SubmissionSchema.avsc", "rb") as schema_file:
             self.SubmissionSchema = avro.schema.parse(schema_file.read())
 
         # self.CommentOutput = DataFileWriter(
@@ -33,9 +34,17 @@ class CommentSubmissionProducer:
         #     DatumWriter(), 
         #     self.SubmissionSchema)
 
+        self.config = configparser.ConfigParser()
+        self.config.read("secrets/credentials.ini")
+
         self.reddit = praw.Reddit(
-            "RedditCredentials1"
+            client_id=str(self.config.get('RedditCredentials', 'client_id')),
+            client_secret=str(self.config.get('RedditCredentials', 'client_secret')),
+            # password=self.config.get('RedditCredentials', 'password'),
+            username=str(self.config.get('RedditCredentials', 'username')),
+            user_agent=str(self.config.get('RedditCredentials', 'user_agent'))
         )
+
         self.subreddit_list = subreddit_list
         self.subreddit = self.reddit.subreddit("+".join(str(x) for x in self.subreddit_list))
 
@@ -87,7 +96,7 @@ class CommentSubmissionProducer:
                             "submissionSelfText": comment.submission.selftext, 
                             "score": comment.score
                         }
-
+                        print(CommentData)
                         byteStream = io.BytesIO()
                         encoder = avro.io.BinaryEncoder(byteStream)
                         avro.io.DatumWriter(self.CommentSchema).write(CommentData, encoder)
