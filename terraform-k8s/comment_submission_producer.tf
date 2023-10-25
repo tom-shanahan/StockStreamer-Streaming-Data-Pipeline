@@ -8,7 +8,8 @@ resource "kubernetes_deployment" "commentsubmissionproducer" {
   }
 
   depends_on = [
-    kubernetes_deployment.kafkaservice
+    kubernetes_deployment.kafkaservice, 
+    kubernetes_deployment.cassandra
   ]
 
   spec {
@@ -34,7 +35,23 @@ resource "kubernetes_deployment" "commentsubmissionproducer" {
           name = "commentsubmissionproducer"
           image = "tshanahan/comment_submission_producer:latest"
           image_pull_policy = "Always"
+
+          volume_mount {
+            name = "credentials"
+            mount_path = "/app/secrets/"
+            read_only = true
+          }
+
         }
+
+        volume {
+          name = "credentials"
+
+          secret {
+            secret_name = kubernetes_secret.credentials.metadata[0].name
+          }
+        }
+
         restart_policy = "Always"
       }
     }

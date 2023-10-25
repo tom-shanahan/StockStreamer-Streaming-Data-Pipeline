@@ -7,9 +7,7 @@ resource "kubernetes_deployment" "zookeeper" {
     }
   }
 
-  depends_on = [
-    kubernetes_namespace.pipeline-namespace
-  ]
+  depends_on = [ kubernetes_namespace.pipeline-namespace ]
 
   spec {
     replicas = 1
@@ -32,7 +30,7 @@ resource "kubernetes_deployment" "zookeeper" {
       spec {
         container {
           name = "zookeeper"
-          image = "confluentinc/cp-zookeeper:${var.confluent_zookeeper_version}"
+          image = "confluentinc/cp-zookeeper:7.3.5"
           
           port {
             container_port = 2181
@@ -66,10 +64,9 @@ resource "kubernetes_deployment" "kafkaservice" {
 
   depends_on = [
     kubernetes_deployment.zookeeper, 
-    kubernetes_persistent_volume.kafka-volume, 
-    kubernetes_persistent_volume_claim.kafka-volume
+    kubernetes_persistent_volume.kafkavolume, 
+    kubernetes_persistent_volume_claim.kafkavolume
   ]
-
 
   spec {
     replicas = 1
@@ -84,29 +81,22 @@ resource "kubernetes_deployment" "kafkaservice" {
       metadata {
         labels = {
           "k8s.network/pipeline-network" = "true"
-          
           "k8s.service" = "kafka"
         }
       }
 
       spec {
         volume {
-          name = "kafka-volume"
+          name = "kafkavolume"
 
           persistent_volume_claim {
-            claim_name = "kafka-volume"
+            claim_name = "kafkavolume"
           }
         }
 
         container {
           name = "kafkaservice"
-          image = "confluentinc/cp-kafka:${var.confluent_kafka_version}"
-
-          # mounting volume
-          volume_mount {
-            name = "kafka-volume"
-            mount_path = "/var/data"
-          }
+          image = "confluentinc/cp-kafka:7.3.2"
 
           # ports
           port {
@@ -116,10 +106,16 @@ resource "kubernetes_deployment" "kafkaservice" {
             container_port = 29092
           }
 
+          # mounting volume
+          volume_mount {
+            name = "kafkavolume"
+            mount_path = "/var/data"
+          }
+
           # environment variables
           env {
             name = "KAFKA_ADVERTISED_LISTENERS"
-            value = "PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafkaservice.${var.namespace}.svc.cluster.local:29092"
+            value = "PLAINTEXT://kafkaservice:9092,PLAINTEXT_INTERNAL://kafkaservice.${var.namespace}.svc.cluster.local:29092"
           }
 
           env {
@@ -152,37 +148,24 @@ resource "kubernetes_deployment" "kafkaservice" {
             value = "zookeeper:2181"
           }
 
-          #! not required for now
-          # env {
-          #   name = "KAFKA_LISTENERS"
-          #   value = "PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092"
-          # }
-
-          # env {
-          #   name = "KAFKA_INTER_BROKER_LISTENER_NAME"
-          #   value = "PLAINTEXT"
-          # }
-
-          # env {
-          #   name = "KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR"
-          #   value = "1"
-          # }
-
-          # env {
-          #   name = "KAFKA_CONFLUENT_LICENCE_TOPIC_REPLICATION_FACTOR"
-          #   value = "1"
-          # }
-
-          # env {
-          #   name = "KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS"
-          #   value = "0"
-          # }
-
         }
+
+
+        container {
+          name = "kafkainit"
+          image = "confluentinc/cp-kafka:7.3.5"
+
+          command = ["/bin/sh"]
+          args = [
+            "-c",
+            "kafka-topics --bootstrap-server kafkaservice:29092 --list; echo -e 'Creating kafka topics'; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic redditComments --replication-factor 1 --partitions 1; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic stockPrices --replication-factor 1 --partitions 1; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic redditSubmissions --replication-factor 1 --partitions 1; echo -e 'Successfully created the following topics:'; kafka-topics --bootstrap-server kafkaservice:29092 --list; tail -f /dev/null;",
+          ]
+        }
+
 
         container {
           name = "kafdrop"
-          image = "obsidiandynamics/kafdrop:3.30.0"
+          image = "obsidiandynamics/kafdrop:3.31.0"
 
           port {
             container_port = 19000
@@ -210,9 +193,7 @@ resource "kubernetes_service" "zookeeper" {
     }
   }
 
-  depends_on = [
-    kubernetes_deployment.zookeeper
-  ]
+  depends_on = [ kubernetes_deployment.zookeeper ]
 
   spec {
     port {
@@ -238,9 +219,7 @@ resource "kubernetes_service" "kafkaservice" {
     }
   }
 
-  depends_on = [
-    kubernetes_deployment.kafkaservice
-  ]
+  depends_on = [ kubernetes_deployment.kafkaservice ]
 
   spec {
     port {

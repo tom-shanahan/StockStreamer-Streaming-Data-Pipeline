@@ -15,7 +15,7 @@ resource "kubernetes_secret" "credentials" {
     ]
 
     data = {
-      "credentials.cfg" = "${file("../secrets/credentials.cfg")}"
+      "credentials.ini" = "${file("../secrets/credentials.ini")}"
     }
 }
 
@@ -25,9 +25,7 @@ resource "kubernetes_network_policy" "pipeline_network" {
     namespace = "${var.namespace}"
   }
 
-  depends_on = [
-    kubernetes_namespace.pipeline-namespace
-  ]
+  depends_on = [ kubernetes_namespace.pipeline-namespace ]
 
   spec {
     pod_selector {
@@ -42,7 +40,7 @@ resource "kubernetes_network_policy" "pipeline_network" {
       from {
         pod_selector {
           match_labels = {
-            "k8s.network/pipeline-networ" = "true"
+            "k8s.network/pipeline-network" = "true"
           }
         }
       }
