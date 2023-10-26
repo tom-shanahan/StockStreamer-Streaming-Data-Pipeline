@@ -14,9 +14,9 @@ class StockPriceProducer:
     def __init__(self):
 
         self.producer = KafkaProducer(bootstrap_servers=['kafkaservice:9092'],  api_version=(0,10,2))
-        self.KafkaTopic = 'stockPrices'
+        self.KafkaTopic = 'stockprices'
 
-        with open("stock_price_producer/StockPriceSchema.avsc", "rb") as schema_file:
+        with open("src/schemas/StockPriceSchema.avsc", "rb") as schema_file:
             self.schema = avro.schema.parse(schema_file.read())
 
         self.StockPriceOutput = DataFileWriter(
@@ -25,7 +25,8 @@ class StockPriceProducer:
             self.schema)
         
         # self.streamingTickers = pd.read_csv("BatchProcessing/StreamingTickers.csv").stack().tolist()
-        self.streamingTickers = ['AAPL','AMC','AMD','DIS','F','FB','NVDA','QQQ','TSLA','V']
+        # 'BINANCE:BTCUSDT'
+        self.streamingTickers = ['AAPL','AMC','AMD','DIS','F','FB','NVDA','QQQ','TSLA','V', 'BINANCE:BTCUSDT']
 
         self.config = configparser.ConfigParser()
         self.config.read("secrets/credentials.ini")

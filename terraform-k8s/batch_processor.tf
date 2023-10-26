@@ -9,6 +9,7 @@ resource "kubernetes_deployment" "spark" {
 
   depends_on = [
         kubernetes_service.commentsubmissionproducer, 
+        kubernetes_service.stockpriceproducer, 
         kubernetes_service.cassandra
     ]
 

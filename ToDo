@@ -1,3 +1,9 @@
+KEY IS NOT UNIQUE, BEING OVERWRITTEN -> NEED TO STRUCTURE OUTPUT
+
+how to pass schemas in terraform
+https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax
+https://developer.hashicorp.com/terraform/language/resources/provisioners/file
+
 - read parquet output - done
 - stream2hdfs to class - done
 - create spark batch analysis
@@ -5,6 +11,7 @@
     - identify stocks referenced
     - sentiment analysis of comment
     - https://github.com/asad70/reddit-sentiment-analysis
+    - get yFinance data
 - dockerize
 - check spark warns
 

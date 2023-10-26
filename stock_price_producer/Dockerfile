@@ -17,4 +17,4 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-CMD ["python","src/comment_submission_producer.py"]
+CMD ["python","src/stock_price_producer.py"]

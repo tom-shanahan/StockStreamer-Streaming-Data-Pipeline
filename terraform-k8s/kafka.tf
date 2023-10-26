@@ -7,7 +7,9 @@ resource "kubernetes_deployment" "zookeeper" {
     }
   }
 
-  depends_on = [ kubernetes_namespace.pipeline-namespace ]
+  depends_on = [
+    kubernetes_namespace.pipeline-namespace
+  ]
 
   spec {
     replicas = 1
@@ -158,7 +160,7 @@ resource "kubernetes_deployment" "kafkaservice" {
           command = ["/bin/sh"]
           args = [
             "-c",
-            "kafka-topics --bootstrap-server kafkaservice:29092 --list; echo -e 'Creating kafka topics'; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic redditComments --replication-factor 1 --partitions 1; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic stockPrices --replication-factor 1 --partitions 1; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic redditSubmissions --replication-factor 1 --partitions 1; echo -e 'Successfully created the following topics:'; kafka-topics --bootstrap-server kafkaservice:29092 --list; tail -f /dev/null;",
+            "kafka-topics --bootstrap-server kafkaservice:29092 --list; echo -e 'Creating kafka topics'; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic redditcomments --replication-factor 1 --partitions 1; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic stockprices --replication-factor 1 --partitions 1; kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic redditsubmissions --replication-factor 1 --partitions 1; echo -e 'Successfully created the following topics:'; kafka-topics --bootstrap-server kafkaservice:29092 --list; tail -f /dev/null;",
           ]
         }
 

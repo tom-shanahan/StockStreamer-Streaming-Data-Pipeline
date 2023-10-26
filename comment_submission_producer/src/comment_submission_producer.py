@@ -19,8 +19,8 @@ class CommentSubmissionProducer:
         print("TESTTTTTTTTTTTTTTTTTTTTTT")
     
         self.producer = KafkaProducer(bootstrap_servers=['kafkaservice:9092'],  api_version=(0,10,2))
-        self.KafkaTopicSubmissions = "redditSubmissions"
-        self.KafkaTopicComments = "redditComments"
+        self.KafkaTopicSubmissions = "redditsubmissions"
+        self.KafkaTopicComments = "redditcomments"
 
         with open("src/schemas/CommentSchema.avsc", "rb") as schema_file:
             self.CommentSchema = avro.schema.parse(schema_file.read())
