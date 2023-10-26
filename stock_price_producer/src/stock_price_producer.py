@@ -50,7 +50,6 @@ class StockPriceProducer:
             for singleRecord in message_json['data']:
                 self.StockPriceOutput.append(singleRecord)
 
-
                 byteStream = io.BytesIO()
                 encoder = avro.io.BinaryEncoder(byteStream)
                 avro.io.DatumWriter(self.schema).write(singleRecord, encoder)

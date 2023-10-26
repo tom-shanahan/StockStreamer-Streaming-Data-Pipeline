@@ -28,29 +28,36 @@ class BatchProcessor:
         def writeTopic(df, BatchId):
 
             topics = df.select("topic").distinct().rdd.flatMap(lambda x: x).collect()
-            print(topics)
-            print(topics)
-            print(topics)
-            print(topics)
-            print(topics)
-
             for topic in topics:
-                topicDf = df.filter(df["topic"] == topic) \
-                    .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
+                if topic == 'stockprices':
+                    topicDf = df.filter(df["topic"] == topic) \
+                        .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
+                    
+                    writeDf = topicDf.withColumn("conditions", col("data.c")) \
+                        .withColumn("price", col("data.p")) \
+                        .withColumn("symbol", col("data.s")) \
+                        .withColumn("timestamp", col("data.t")) \
+                        .withColumn("volume", col("data.v")) \
+                        .drop("data", "key")
+  
+                    writeDf.write \
+                        .option("failOnDataLoss", "false") \
+                        .options(table="output_data6", keyspace=topic) \
+                        .option("checkpointLocation", "/tmp/check_point/") \
+                        .format("org.apache.spark.sql.cassandra") \
+                        .mode("append") \
+                        .save()
+                else:
+                    topicDf = df.filter(df["topic"] == topic) \
+                        .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
 
-                print(topicDf.count())
-                print(topicDf.count())
-                print(topicDf.count())
-                print(topicDf.count())
-                print(topicDf.count())
-
-                topicDf.write \
-                    .option("failOnDataLoss", "false") \
-                    .options(table="output_data3", keyspace=topic) \
-                    .option("checkpointLocation", "/tmp/check_point/") \
-                    .format("org.apache.spark.sql.cassandra") \
-                    .mode("append") \
-                    .save()
+                    topicDf.write \
+                        .option("failOnDataLoss", "false") \
+                        .options(table="output_data6", keyspace=topic) \
+                        .option("checkpointLocation", "/tmp/check_point/") \
+                        .format("org.apache.spark.sql.cassandra") \
+                        .mode("append") \
+                        .save()
 
         kafkaStreamDF.writeStream \
             .trigger(processingTime="5 seconds") \
