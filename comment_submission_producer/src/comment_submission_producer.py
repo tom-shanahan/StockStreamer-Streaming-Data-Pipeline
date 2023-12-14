@@ -1,15 +1,12 @@
 import io
 import praw
 import avro.schema
-# from avro.datafile import DataFileWriter
-from avro.io import DatumWriter, BinaryEncoder
 from kafka import *
 import configparser
 
 subreddit_list = ['stocks','wallstreetbets','investing','StockMarket',
                   'traders','ValueInvesting','StockMarket','finance',
                   'Daytrading','dividends','trading']
-# subreddit_list = ['stocks','wallstreetbets','investing']
 
 class CommentSubmissionProducer:
 
@@ -67,8 +64,8 @@ class CommentSubmissionProducer:
                         avro.io.DatumWriter(self.SubmissionSchema).write(SubmissionData, encoder)
 
                         self.producer.send(topic = self.KafkaTopicSubmissions, 
-                            key = str(submission.id).encode('utf-8'), 
-                            value = byteStream.getvalue())
+                                           key = str(submission.id).encode('utf-8'), 
+                                           value = byteStream.getvalue())
                     
                 for comment in self.comment_stream:
                     if comment is None:
@@ -91,8 +88,8 @@ class CommentSubmissionProducer:
                         avro.io.DatumWriter(self.CommentSchema).write(CommentData, encoder)
 
                         self.producer.send(topic = self.KafkaTopicComments, 
-                            key = str(comment.id).encode('utf-8'), 
-                            value = byteStream.getvalue())
+                                           key = str(comment.id).encode('utf-8'), 
+                                           value = byteStream.getvalue())
                                 
             except BaseException as e:
                 print("Exception")

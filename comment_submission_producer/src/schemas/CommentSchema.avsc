@@ -3,6 +3,7 @@
 	"namespace": "RedditStreamProducer",
 	"name": "comment",
 	"fields": [
+			{"name": "id", 					"type": "string", 	"doc": "ID of the comment"}, 
 			{"name": "body", 				"type": "string", 	"doc": "Body of the comment, as Markdown"}, 
 			{"name": "created_utc", 		"type": "int", 		"doc": "Created time UTC UNIX milliseconds timestamp"}, 
 			{"name": "subreddit", 			"type": "string", 	"doc": "Subreddit that the comment belongs to"}, 

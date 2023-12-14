@@ -8,6 +8,7 @@ from avro.datafile import DataFileWriter
 from avro.io import DatumWriter
 from kafka import *
 import configparser
+from pandas import read_csv
 
 class StockPriceProducer:
 
@@ -23,10 +24,9 @@ class StockPriceProducer:
             open("StockPriceOutput.avro", "wb"), 
             DatumWriter(), 
             self.schema)
-        
-        # self.streamingTickers = pd.read_csv("BatchProcessing/StreamingTickers.csv").stack().tolist()
-        # 'BINANCE:BTCUSDT'
-        self.streamingTickers = ['AAPL','AMC','AMD','DIS','F','FB','NVDA','QQQ','TSLA','V', 'BINANCE:BTCUSDT']
+
+        tickers = read_csv("src/tickers.csv")
+        self.streamingTickers = tickers['ticker'].tolist()
 
         self.config = configparser.ConfigParser()
         self.config.read("secrets/credentials.ini")
