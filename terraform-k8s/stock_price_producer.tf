@@ -1,3 +1,4 @@
+# defines Kubernetes Deployment 
 resource "kubernetes_deployment" "stockpriceproducer" {
   metadata {
     name = "stockpriceproducer"
@@ -14,7 +15,6 @@ resource "kubernetes_deployment" "stockpriceproducer" {
 
   spec {
     replicas = 1
-
     selector {
       match_labels = {
         "k8s.service" = "stockpriceproducer"
@@ -25,7 +25,6 @@ resource "kubernetes_deployment" "stockpriceproducer" {
       metadata {
         labels = {
           "k8s.service" = "stockpriceproducer"
-
           "k8s.network/pipeline-network" = "true"
         }
       }
@@ -35,29 +34,26 @@ resource "kubernetes_deployment" "stockpriceproducer" {
           name = "stockpriceproducer"
           image = "tshanahan/stock_price_producer:latest"
           image_pull_policy = "Always"
-
           volume_mount {
             name = "credentials"
             mount_path = "/app/secrets/"
             read_only = true
           }
-
         }
 
         volume {
           name = "credentials"
-
           secret {
             secret_name = kubernetes_secret.credentials.metadata[0].name
           }
         }
-
         restart_policy = "Always"
       }
     }
   }
 }
 
+# # defines headless Kubernetes service stockpriceproducer
 resource "kubernetes_service" "stockpriceproducer" {
   metadata {
     name = "stockpriceproducer"
@@ -66,15 +62,13 @@ resource "kubernetes_service" "stockpriceproducer" {
       "k8s.service" = "stockpriceproducer"
     }
   }
-
-
-  depends_on = [kubernetes_deployment.stockpriceproducer]
-
+  depends_on = [
+    kubernetes_deployment.stockpriceproducer
+  ]
   spec {
     selector = {
         "k8s.service" = "stockpriceproducer"
     }
-
     cluster_ip = "None"
   }
 }

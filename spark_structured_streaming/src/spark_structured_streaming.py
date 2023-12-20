@@ -1,7 +1,7 @@
 import re 
 from pyspark.sql import SparkSession
 from pyspark.sql.avro.functions import from_avro
-from pyspark.sql.functions import col, udf, collect_set, explode
+from pyspark.sql.functions import col, udf
 from pyspark.sql.types import ArrayType, StringType, DoubleType
 from pandas import read_csv
 
@@ -22,7 +22,7 @@ def analyzeSentiment(text):
 def extractTickers(submission_titles, submission_bodies):
     submission_titles_tickers = re.findall(r'\b[A-Z]{1,4}\b', submission_titles)
     submission_bodies_tickers = re.findall(r'\b[A-Z]{1,4}\b', submission_bodies)
-    return [ticker for ticker in submission_titles_tickers+submission_bodies_tickers if ticker in stock_tickers]
+    return list(set([ticker for ticker in submission_titles_tickers+submission_bodies_tickers if ticker in stock_tickers]))
 
 class BatchProcessor:
 
@@ -40,6 +40,8 @@ class BatchProcessor:
             "redditsubmissions":    open("src/schemas/SubmissionSchema.avsc", "r").read(), 
             "redditcomments":       open("src/schemas/CommentSchema.avsc", "r").read()
         }
+
+        print(",".join(self.kafka_schemas.keys()))
 
         kafkaStreamDF = self.spark.readStream \
             .format("kafka") \
@@ -64,7 +66,7 @@ class BatchProcessor:
   
                     writeDf.write \
                         .option("failOnDataLoss", "false") \
-                        .options(table="output_data7", keyspace=topic) \
+                        .options(table="output_data", keyspace=topic) \
                         .option("checkpointLocation", "/tmp/check_point/") \
                         .format("org.apache.spark.sql.cassandra") \
                         .mode("append") \
@@ -90,7 +92,7 @@ class BatchProcessor:
 
                     writeDf.write \
                         .option("failOnDataLoss", "false") \
-                        .options(table="output_data7", keyspace=topic) \
+                        .options(table="output_data", keyspace=topic) \
                         .option("checkpointLocation", "/tmp/check_point/") \
                         .format("org.apache.spark.sql.cassandra") \
                         .mode("append") \
@@ -116,7 +118,7 @@ class BatchProcessor:
 
                     writeDf.write \
                         .option("failOnDataLoss", "false") \
-                        .options(table="output_data7", keyspace=topic) \
+                        .options(table="output_data", keyspace=topic) \
                         .option("checkpointLocation", "/tmp/check_point/") \
                         .format("org.apache.spark.sql.cassandra") \
                         .mode("append") \

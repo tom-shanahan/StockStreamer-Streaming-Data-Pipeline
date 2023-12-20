@@ -1,6 +1,7 @@
 import io
 import praw
 import avro.schema
+import avro.io
 from kafka import *
 import configparser
 

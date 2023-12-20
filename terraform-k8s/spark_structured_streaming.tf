@@ -1,13 +1,14 @@
-resource "kubernetes_deployment" "spark" {
+# defines Kubernetes Deployment 
+resource "kubernetes_deployment" "sparkstructuredstreaming" {
     metadata {
-        name = "spark"
+        name = "sparkstructuredstreaming"
         namespace = "${var.namespace}"
         labels = {
-            "k8s.service" = "spark"
+            "k8s.service" = "sparkstructuredstreaming"
         }
     }
 
-  depends_on = [
+    depends_on = [
         kubernetes_service.commentsubmissionproducer, 
         kubernetes_service.stockpriceproducer, 
         kubernetes_service.cassandra
@@ -15,29 +16,25 @@ resource "kubernetes_deployment" "spark" {
 
     spec {
         replicas = 1
-
         selector {
             match_labels = {
-                "k8s.service" = "spark"
+                "k8s.service" = "sparkstructuredstreaming"
             }
         }
 
         template {
             metadata {
                 labels = {
-                    "k8s.service" = "spark"
-
+                    "k8s.service" = "sparkstructuredstreaming"
                     "k8s.network/pipeline-network" = "true"
                 }
             }
 
             spec {
                 container {
-                    name = "spark"
-                    image = "tshanahan/batch_processor:latest"
+                    name = "sparkstructuredstreaming"
+                    image = "tshanahan/spark_structured_streaming:latest"
                     image_pull_policy = "Always"
-
-                    # environment variables
                     env {
                         name = "KAFKA_BROKERS"
                         value = "kafkaservice.${var.namespace}.svc.cluster.local:9092"
@@ -48,24 +45,22 @@ resource "kubernetes_deployment" "spark" {
     }
 }
 
-resource "kubernetes_service" "spark" {
+# defines headless Kubernetes service sparkstructuredstreaming
+resource "kubernetes_service" "sparkstructuredstreaming" {
     metadata {
-        name = "spark"
+        name = "sparkstructuredstreaming"
         namespace = "${var.namespace}"
         labels = {
-            "k8s.service" = "spark"
+            "k8s.service" = "sparkstructuredstreaming"
         }
     }
-  
     depends_on = [
-        kubernetes_deployment.spark
+        kubernetes_deployment.sparkstructuredstreaming
     ]
-
     spec {
         selector = {
-            "k8s.service" = "spark"
+            "k8s.service" = "sparkstructuredstreaming"
         }
-
         cluster_ip = "None"
     }
 }

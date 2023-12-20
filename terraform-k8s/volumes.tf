@@ -1,10 +1,12 @@
+# defines Kubernetes Persistent Volumes and Volume Claims for Kafka and Cassandra
+# storage_class_name = "hostpath": uses the local node's file system for storage; useful for development/testing environments
 resource "kubernetes_persistent_volume" "kafkavolume" {
   metadata {
     name = "kafkavolume"
   }
-
-  depends_on = [ kubernetes_namespace.pipeline-namespace ]
-
+  depends_on = [
+    kubernetes_namespace.pipeline-namespace
+  ]
   spec {
     capacity = {
         storage = "1Gi"
@@ -28,32 +30,30 @@ resource "kubernetes_persistent_volume_claim" "kafkavolume" {
         "k8s.service" = "kafkavolume"
     }
   }
-
-  depends_on = [ kubernetes_namespace.pipeline-namespace ]
-
+  depends_on = [
+    kubernetes_namespace.pipeline-namespace
+  ]
   spec {
     access_modes = ["ReadWriteMany"]
     storage_class_name = "hostpath"
-
     resources {
       requests = {
-        storage = "1Gi"
+        storage = "500Mi"
       }
     }
   }
 }
 
-# cassandra
 resource "kubernetes_persistent_volume" "cassandravolume" {
   metadata {
     name = "cassandravolume"
   }
   depends_on = [
-        kubernetes_namespace.pipeline-namespace
+    kubernetes_namespace.pipeline-namespace
   ]
   spec {
     capacity = {
-      storage = "10Gi"
+      storage = "5Gi"
     }
     access_modes = ["ReadWriteMany"]
     storage_class_name = "hostpath"
@@ -75,7 +75,9 @@ resource "kubernetes_persistent_volume_claim" "cassandravolume" {
     }
   }
 
-  depends_on = [ kubernetes_namespace.pipeline-namespace ]
+  depends_on = [
+    kubernetes_namespace.pipeline-namespace
+  ]
 
   spec {
     access_modes = ["ReadWriteMany"]
@@ -83,7 +85,7 @@ resource "kubernetes_persistent_volume_claim" "cassandravolume" {
 
     resources {
       requests = {
-        storage = "1Gi"
+        storage = "500Mi"
       }
     }
   }

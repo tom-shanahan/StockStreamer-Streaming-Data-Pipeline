@@ -8,8 +8,12 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-CMD ["/opt/spark/bin/spark-submit", "--jars", "jars/spark-cassandra-connector-assembly_2.12-3.4.0.jar,jars/spark-cassandra-connector_2.12-3.4.0.jar,jars/spark-token-provider-kafka-0-10_2.12-3.4.0.jar,jars/commons-pool2-2.12.0.jar,jars/kafka-clients-3.4.0.jar,jars/spark-avro_2.12-3.4.0.jar,jars/spark-sql-kafka-0-10_2.12-3.4.0.jar", "src/batch_processor.py"]
-
+CMD [ \
+  "/opt/spark/bin/spark-submit", \
+  "--jars", \
+  "jars/spark-cassandra-connector-assembly_2.12-3.4.0.jar,jars/spark-cassandra-connector_2.12-3.4.0.jar,jars/spark-token-provider-kafka-0-10_2.12-3.4.0.jar,jars/commons-pool2-2.12.0.jar,jars/kafka-clients-3.4.0.jar,jars/spark-avro_2.12-3.4.0.jar,jars/spark-sql-kafka-0-10_2.12-3.4.0.jar", \
+  "src/spark_structured_streaming.py" \
+]
 
 
 
