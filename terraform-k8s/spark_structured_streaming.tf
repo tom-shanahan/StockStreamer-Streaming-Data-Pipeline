@@ -11,6 +11,7 @@ resource "kubernetes_deployment" "sparkstructuredstreaming" {
     depends_on = [
         kubernetes_service.commentsubmissionproducer, 
         kubernetes_service.stockpriceproducer, 
+        kubernetes_service.kafkaservice, 
         kubernetes_service.cassandra
     ]
 

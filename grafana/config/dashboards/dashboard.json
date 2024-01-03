@@ -1,0 +1,516 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 2,
+  "id": 2,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "datasource": {
+        "type": "hadesarchitect-cassandra-datasource",
+        "uid": "P0CF359B33E83E15F"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 51,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "StockMarket": {
+                  "color": "dark-orange",
+                  "index": 1
+                },
+                "ValueInvesting": {
+                  "color": "dark-purple",
+                  "index": 4
+                },
+                "dividends": {
+                  "color": "super-light-red",
+                  "index": 5
+                },
+                "investing": {
+                  "color": "dark-green",
+                  "index": 2
+                },
+                "stocks": {
+                  "color": "dark-red",
+                  "index": 0
+                },
+                "wallstreetbets": {
+                  "color": "dark-blue",
+                  "index": 3
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "interval": "15",
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "colorByField": "subreddit",
+        "fullHighlight": true,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "asc"
+        },
+        "xField": "created_utc",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 200
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "P0CF359B33E83E15F"
+          },
+          "datasourceId": 2,
+          "keyspace": "redditsubmissions",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "A",
+          "target": "SELECT ticker, created_utc,  body, body_sentiment_score, subreddit\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker';"
+        }
+      ],
+      "title": "Reddit Comment Sentiment",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "hadesarchitect-cassandra-datasource",
+        "uid": "PF038138A61D81EB8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 5,
+      "interval": "15",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PF038138A61D81EB8"
+          },
+          "datasourceId": 3,
+          "keyspace": "stockprices",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "A",
+          "target": "SELECT symbol, timestamp, price \nFROM stockprices.output_data \nWHERE symbol = '$selected_ticker';"
+        }
+      ],
+      "title": "Stock Price Plot",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "hadesarchitect-cassandra-datasource",
+        "uid": "P0CF359B33E83E15F"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "dark-blue",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 8,
+      "interval": "15",
+      "options": {
+        "displayMode": "lcd",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "valueMode": "color"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "alias": "{{ticker}}",
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "P0CF359B33E83E15F"
+          },
+          "datasourceId": 2,
+          "keyspace": "redditsubmissions",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "A",
+          "target": "SELECT ticker, COUNT(ticker) as cnt\nFROM redditcomments.output_data\nGROUP BY ticker;"
+        }
+      ],
+      "title": "Reddit Comment Count",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {}
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "hadesarchitect-cassandra-datasource",
+        "uid": "PF038138A61D81EB8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 6,
+      "interval": "15",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PF038138A61D81EB8"
+          },
+          "datasourceId": 3,
+          "hide": false,
+          "keyspace": "stockprices",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "A",
+          "target": "SELECT symbol, timestamp, volume\nFROM stockprices.output_data\nWHERE symbol = '$selected_ticker';"
+        }
+      ],
+      "title": "Trading Volume",
+      "transformations": [],
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "FB",
+          "value": "FB"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Selected Ticker",
+        "multi": false,
+        "name": "selected_ticker",
+        "options": [
+          {
+            "selected": false,
+            "text": "AAPL",
+            "value": "AAPL"
+          },
+          {
+            "selected": false,
+            "text": "AMZN",
+            "value": "AMZN"
+          },
+          {
+            "selected": false,
+            "text": "DIS",
+            "value": "DIS"
+          },
+          {
+            "selected": true,
+            "text": "FB",
+            "value": "FB"
+          },
+          {
+            "selected": false,
+            "text": "GOOG",
+            "value": "GOOG"
+          },
+          {
+            "selected": false,
+            "text": "INTC",
+            "value": "INTC"
+          },
+          {
+            "selected": false,
+            "text": "MSFT",
+            "value": "MSFT"
+          },
+          {
+            "selected": false,
+            "text": "NKE",
+            "value": "NKE"
+          },
+          {
+            "selected": false,
+            "text": "TSLA",
+            "value": "TSLA"
+          }
+        ],
+        "query": "AAPL,AMZN,DIS,FB,GOOG,INTC,MSFT,NKE,TSLA",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true,
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Reddit-Stock Price Sentiment Dashboard",
+  "uid": "ae6226ff-80da-4d5f-818c-e5c37205b8ea",
+  "version": 1,
+  "weekStart": ""
+}

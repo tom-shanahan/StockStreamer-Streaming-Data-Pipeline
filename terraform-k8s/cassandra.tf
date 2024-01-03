@@ -103,11 +103,9 @@ resource "kubernetes_deployment" "cassandra" {
             "/bin/sh",
             "-c",
             <<-EOF
-              echo "waiting for cassandra to start" &&
               sleep 30 &&
-              echo "loading cassandra keyspace" &&
+              echo "creating Cassandra keyspaces/tables" &&
               cqlsh cassandra -f /cassandra-setup.cql &&
-              echo "cassandra setup complete" &&
               tail -f /dev/null
             EOF
           ]

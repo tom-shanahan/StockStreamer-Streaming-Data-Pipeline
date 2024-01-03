@@ -145,11 +145,16 @@ resource "kubernetes_deployment" "kafkaservice" {
           args = [
             "-c",
             <<-EOT
+              # sending a message with each create topic command to force creation
+              # topics aren't created until recieve a message
+              # can cause errors if try to query a topic before it recieves a message
+              # this can happen if initiated outside of stock market trading hours
               kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic redditcomments --replication-factor 1 --partitions 1
+              echo "redditcomments" | kafka-console-producer --bootstrap-server kafkaservice:29092 --topic redditcomments
               kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic stockprices --replication-factor 1 --partitions 1
+              echo "stockprices" | kafka-console-producer --bootstrap-server kafkaservice:29092 --topic stockprices
               kafka-topics --bootstrap-server kafkaservice:29092 --create --if-not-exists --topic redditsubmissions --replication-factor 1 --partitions 1
-              echo -e 'created topics:'
-              kafka-topics --bootstrap-server kafkaservice:29092 --list
+              echo "redditsubmissions" | kafka-console-producer --bootstrap-server kafkaservice:29092 --topic redditsubmissions
               tail -f /dev/null
             EOT
           ]
