@@ -20,8 +20,266 @@
   "graphTooltip": 2,
   "id": 2,
   "links": [],
-  "liveNow": true,
+  "liveNow": false,
   "panels": [
+    {
+      "datasource": {
+        "type": "hadesarchitect-cassandra-datasource",
+        "uid": "PBD6C58217FFECC49"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 1,
+          "min": -1,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "hideTimeOverride": true,
+      "id": 9,
+      "interval": "30s",
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PBD6C58217FFECC49"
+          },
+          "datasourceId": 1,
+          "hide": false,
+          "keyspace": "redditcomments",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "D",
+          "target": "SELECT AVG(body_sentiment_score) AS \"Prior 30 Minutes\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' AND created_utc > toTimestamp(now()) - 30m;"
+        },
+        {
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PBD6C58217FFECC49"
+          },
+          "datasourceId": 1,
+          "keyspace": "redditsubmissions",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "A",
+          "target": "SELECT AVG(body_sentiment_score) AS \"Prior 1 Hour\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' AND created_utc > toTimestamp(now()) - 60m ;"
+        },
+        {
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PBD6C58217FFECC49"
+          },
+          "datasourceId": 1,
+          "hide": false,
+          "keyspace": "redditcomments",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "B",
+          "target": "SELECT AVG(body_sentiment_score) AS \"Prior 2 Hours\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' AND created_utc > toTimestamp(now()) - 120m ;"
+        },
+        {
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PBD6C58217FFECC49"
+          },
+          "datasourceId": 1,
+          "hide": false,
+          "keyspace": "redditcomments",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "E",
+          "target": "SELECT AVG(body_sentiment_score) AS \"Prior 4 Hours\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' AND created_utc > toTimestamp(now()) - 480m ;"
+        }
+      ],
+      "timeFrom": "4h",
+      "title": "reddit comment sentiment:",
+      "transformations": [],
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "hadesarchitect-cassandra-datasource",
+        "uid": "PF038138A61D81EB8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "hideTimeOverride": true,
+      "id": 10,
+      "interval": "10s",
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "/.*/",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PF038138A61D81EB8"
+          },
+          "datasourceId": 3,
+          "keyspace": "stockprices",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "A",
+          "target": "SELECT symbol AS \"symbol:\", price AS \"price:\", timestamp AS \"as of:\"\nFROM stockprices.output_data \nWHERE symbol = '$selected_ticker' \nORDER BY timestamp DESC\nLIMIT 1;"
+        }
+      ],
+      "timeFrom": "1h",
+      "title": "latest price:",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "hadesarchitect-cassandra-datasource",
+        "uid": "PF038138A61D81EB8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 4,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 0.0001
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "hideTimeOverride": true,
+      "id": 11,
+      "interval": "10s",
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "diff"
+          ],
+          "fields": "/^price change:$/",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.5.2",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PF038138A61D81EB8"
+          },
+          "datasourceId": 3,
+          "keyspace": "stockprices",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "A",
+          "target": "SELECT symbol, price AS \"price change:\"\nFROM stockprices.output_data \nWHERE symbol = '$selected_ticker' \nORDER BY timestamp DESC\nLIMIT 2;"
+        }
+      ],
+      "timeShift": "1h",
+      "title": "price change:",
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "rowField": "Time",
+            "valueField": "185.344300 price change:"
+          }
+        }
+      ],
+      "type": "stat"
+    },
     {
       "datasource": {
         "type": "hadesarchitect-cassandra-datasource",
@@ -104,10 +362,11 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 5
       },
+      "hideTimeOverride": true,
       "id": 7,
-      "interval": "15",
+      "interval": "30s",
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
@@ -142,9 +401,10 @@
           "queryType": "query",
           "rawQuery": true,
           "refId": "A",
-          "target": "SELECT ticker, created_utc,  body, body_sentiment_score, subreddit\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker';"
+          "target": "SELECT ticker, created_utc,  body, body_sentiment_score, subreddit\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker'\nAND created_utc >= toTimestamp(now()) - 180m;;"
         }
       ],
+      "timeFrom": "3h",
       "title": "Reddit Comment Sentiment",
       "type": "barchart"
     },
@@ -208,13 +468,14 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 7
       },
+      "hideTimeOverride": true,
       "id": 5,
-      "interval": "15",
+      "interval": "10s",
       "options": {
         "legend": {
           "calcs": [],
@@ -239,9 +500,10 @@
           "queryType": "query",
           "rawQuery": true,
           "refId": "A",
-          "target": "SELECT symbol, timestamp, price \nFROM stockprices.output_data \nWHERE symbol = '$selected_ticker';"
+          "target": "SELECT symbol, timestamp, price \nFROM stockprices.output_data \nWHERE symbol = '$selected_ticker' \nAND timestamp >= toTimestamp(now()) - 120m;"
         }
       ],
+      "timeFrom": "2h",
       "title": "Stock Price Plot",
       "type": "timeseries"
     },
@@ -253,9 +515,10 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "continuous-GrYlRd"
+            "mode": "continuous-YlBl"
           },
           "mappings": [],
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -273,13 +536,14 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 13
       },
+      "hideTimeOverride": true,
       "id": 8,
-      "interval": "15",
+      "interval": "30s",
       "options": {
         "displayMode": "lcd",
         "minVizHeight": 10,
@@ -306,9 +570,52 @@
           "queryType": "query",
           "rawQuery": true,
           "refId": "A",
-          "target": "SELECT ticker, COUNT(ticker) as cnt\nFROM redditcomments.output_data\nGROUP BY ticker;"
+          "target": "SELECT ticker, COUNT(ticker) as cnt\nFROM redditcomments.output_data\nWHERE ticker = 'TSLA'\nGROUP BY ticker;"
+        },
+        {
+          "alias": "{{ticker}}",
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "P0CF359B33E83E15F"
+          },
+          "datasourceId": 2,
+          "hide": false,
+          "keyspace": "redditcomments",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "B",
+          "target": "SELECT ticker, COUNT(ticker) as cnt\nFROM redditcomments.output_data\nWHERE ticker = 'AAPL'\nGROUP BY ticker;"
+        },
+        {
+          "alias": "{{ticker}}",
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "P0CF359B33E83E15F"
+          },
+          "datasourceId": 2,
+          "hide": false,
+          "keyspace": "redditcomments",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "C",
+          "target": "SELECT ticker, COUNT(ticker) as cnt\nFROM redditcomments.output_data\nWHERE ticker = 'INTC'\nGROUP BY ticker;"
+        },
+        {
+          "alias": "{{ticker}}",
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "P0CF359B33E83E15F"
+          },
+          "datasourceId": 2,
+          "hide": false,
+          "keyspace": "redditcomments",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "D",
+          "target": "SELECT ticker, COUNT(ticker) as cnt\nFROM redditcomments.output_data\nWHERE ticker = 'MSFT'\nGROUP BY ticker;"
         }
       ],
+      "timeFrom": "6h",
       "title": "Reddit Comment Count",
       "transformations": [
         {
@@ -373,18 +680,19 @@
               }
             ]
           },
-          "unit": "none"
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 14
       },
+      "hideTimeOverride": true,
       "id": 6,
-      "interval": "15",
+      "interval": "10s",
       "options": {
         "legend": {
           "calcs": [],
@@ -411,15 +719,16 @@
           "queryType": "query",
           "rawQuery": true,
           "refId": "A",
-          "target": "SELECT symbol, timestamp, volume\nFROM stockprices.output_data\nWHERE symbol = '$selected_ticker';"
+          "target": "SELECT symbol, timestamp, volume\nFROM stockprices.output_data\nWHERE symbol = '$selected_ticker' \nAND timestamp >= toTimestamp(now()) - 120m;"
         }
       ],
+      "timeFrom": "2h",
       "title": "Trading Volume",
       "transformations": [],
       "type": "timeseries"
     }
   ],
-  "refresh": "10s",
+  "refresh": false,
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -428,8 +737,8 @@
       {
         "current": {
           "selected": true,
-          "text": "FB",
-          "value": "FB"
+          "text": "TSLA",
+          "value": "TSLA"
         },
         "hide": 0,
         "includeAll": false,
@@ -444,26 +753,6 @@
           },
           {
             "selected": false,
-            "text": "AMZN",
-            "value": "AMZN"
-          },
-          {
-            "selected": false,
-            "text": "DIS",
-            "value": "DIS"
-          },
-          {
-            "selected": true,
-            "text": "FB",
-            "value": "FB"
-          },
-          {
-            "selected": false,
-            "text": "GOOG",
-            "value": "GOOG"
-          },
-          {
-            "selected": false,
             "text": "INTC",
             "value": "INTC"
           },
@@ -473,17 +762,12 @@
             "value": "MSFT"
           },
           {
-            "selected": false,
-            "text": "NKE",
-            "value": "NKE"
-          },
-          {
-            "selected": false,
+            "selected": true,
             "text": "TSLA",
             "value": "TSLA"
           }
         ],
-        "query": "AAPL,AMZN,DIS,FB,GOOG,INTC,MSFT,NKE,TSLA",
+        "query": "AAPL,INTC,MSFT,TSLA",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
@@ -491,7 +775,7 @@
     ]
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {

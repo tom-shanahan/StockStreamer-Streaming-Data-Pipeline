@@ -72,90 +72,98 @@ class BatchProcessor:
             .load()
 
         def writeTopic(df, BatchId):
+            try:
+                topics = df.select("topic").distinct().rdd.flatMap(lambda x: x).collect()
+                for topic in topics:
+                    if topic == 'stockprices':
+                        topicDf = df.filter(df["topic"] == topic) \
+                            .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
+                        
+                        writeDf = topicDf.withColumn("conditions", col("data.c")) \
+                            .withColumn("price", col("data.p")) \
+                            .withColumn("symbol", col("data.s")) \
+                            .withColumn("timestamp", from_unixtime(col("data.t").cast(FloatType()) / lit(1000))) \
+                            .withColumn("volume", col("data.v")) \
+                            .drop("data", "key")
+    
+                        writeDf.write \
+                            .option("failOnDataLoss", "false") \
+                            .options(table="output_data", keyspace=topic) \
+                            .option("checkpointLocation", "/tmp/check_point/") \
+                            .format("org.apache.spark.sql.cassandra") \
+                            .mode("append") \
+                            .save()
+                        
+                    elif topic == 'redditsubmissions':
+                        topicDf = df.filter(df["topic"] == topic) \
+                            .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
 
-            topics = df.select("topic").distinct().rdd.flatMap(lambda x: x).collect()
-            for topic in topics:
-                if topic == 'stockprices':
-                    topicDf = df.filter(df["topic"] == topic) \
-                        .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
-                    
-                    writeDf = topicDf.withColumn("conditions", col("data.c")) \
-                        .withColumn("price", col("data.p")) \
-                        .withColumn("symbol", col("data.s")) \
-                        .withColumn("timestamp", from_unixtime(col("data.t").cast(FloatType()) / lit(1000))) \
-                        .withColumn("volume", col("data.v")) \
-                        .drop("data", "key")
-  
-                    writeDf.write \
-                        .option("failOnDataLoss", "false") \
-                        .options(table="output_data", keyspace=topic) \
-                        .option("checkpointLocation", "/tmp/check_point/") \
-                        .format("org.apache.spark.sql.cassandra") \
-                        .mode("append") \
-                        .save()
-                    
-                elif topic == 'redditsubmissions':
-                    topicDf = df.filter(df["topic"] == topic) \
-                        .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
+                        writeDf = topicDf.withColumn("id", col("data.id")) \
+                            .withColumn("name", col("data.name")) \
+                            .withColumn("title", col("data.title")) \
+                            .withColumn("title_sentiment_score", analyzeSentiment(topicDf["data.title"])) \
+                            .withColumn("selftext", col("data.selftext")) \
+                            .withColumn("selftext_sentiment_score", analyzeSentiment(topicDf["data.selftext"])) \
+                            .withColumn("subreddit", col("data.subreddit")) \
+                            .withColumn("upvote_ratio", col("data.upvote_ratio")) \
+                            .withColumn("num_comments", col("data.num_comments")) \
+                            .withColumn("score", col("data.score")) \
+                            .withColumn("created_utc", from_unixtime(col("data.created_utc").cast(FloatType()))) \
+                            .withColumn("submission_tickers", extractTickers(topicDf["data.title"], topicDf["data.selftext"], topicDf["data.subreddit"])) \
+                            .drop("data", "key") \
+                            .filter(col("submission_tickers").isNotNull() & (col("submission_tickers").getItem(0) != ""))
+                        
+                        exploded_df = writeDf.select(
+                            "*",
+                            explode("submission_tickers").alias("ticker")
+                        )
 
-                    writeDf = topicDf.withColumn("id", col("data.id")) \
-                        .withColumn("name", col("data.name")) \
-                        .withColumn("title", col("data.title")) \
-                        .withColumn("title_sentiment_score", analyzeSentiment(topicDf["data.title"])) \
-                        .withColumn("selftext", col("data.selftext")) \
-                        .withColumn("selftext_sentiment_score", analyzeSentiment(topicDf["data.selftext"])) \
-                        .withColumn("subreddit", col("data.subreddit")) \
-                        .withColumn("upvote_ratio", col("data.upvote_ratio")) \
-                        .withColumn("num_comments", col("data.num_comments")) \
-                        .withColumn("score", col("data.score")) \
-                        .withColumn("created_utc", from_unixtime(col("data.created_utc").cast(FloatType()))) \
-                        .withColumn("submission_tickers", extractTickers(topicDf["data.title"], topicDf["data.selftext"], topicDf["data.subreddit"])) \
-                        .drop("data", "key") 
-                    
-                    exploded_df = writeDf.select(
-                        "*",
-                        explode("submission_tickers").alias("ticker")
-                    )
+                        exploded_df.write \
+                            .option("failOnDataLoss", "false") \
+                            .options(table="output_data", keyspace=topic) \
+                            .option("checkpointLocation", "/tmp/check_point/") \
+                            .format("org.apache.spark.sql.cassandra") \
+                            .mode("append") \
+                            .save()
+                        
+                    elif topic == 'redditcomments':
+                        topicDf = df.filter(df["topic"] == topic) \
+                            .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
 
-                    exploded_df.write \
-                        .option("failOnDataLoss", "false") \
-                        .options(table="output_data", keyspace=topic) \
-                        .option("checkpointLocation", "/tmp/check_point/") \
-                        .format("org.apache.spark.sql.cassandra") \
-                        .mode("append") \
-                        .save()
-                    
-                elif topic == 'redditcomments':
-                    topicDf = df.filter(df["topic"] == topic) \
-                        .select(col("key").cast("string"), from_avro(col("value"), self.kafka_schemas[topic]).alias("data"))
+                        writeDf = topicDf.withColumn("id", col("data.id")) \
+                            .withColumn("body", col("data.body")) \
+                            .withColumn("body_sentiment_score", analyzeSentiment(topicDf["data.body"])) \
+                            .withColumn("created_utc", from_unixtime(col("data.created_utc").cast(FloatType()))) \
+                            .withColumn("subreddit", col("data.subreddit")) \
+                            .withColumn("submissionid", col("data.submissionID")) \
+                            .withColumn("submissiontitle", col("data.submissionTitle")) \
+                            .withColumn("submissiontitle_sentiment_score", analyzeSentiment(topicDf["data.submissiontitle"])) \
+                            .withColumn("submissionselftext", col("data.submissionSelfText")) \
+                            .withColumn("submissionselftext_sentiment_score", analyzeSentiment(topicDf["data.submissionselftext"])) \
+                            .withColumn("score", col("data.score")) \
+                            .withColumn("submission_tickers", extractTickers(topicDf["data.submissiontitle"], topicDf["data.submissionselftext"], topicDf["data.subreddit"])) \
+                            .drop("data", "key") \
+                            .filter(col("submission_tickers").isNotNull() & (col("submission_tickers").getItem(0) != ""))
 
-                    writeDf = topicDf.withColumn("id", col("data.id")) \
-                        .withColumn("body", col("data.body")) \
-                        .withColumn("body_sentiment_score", analyzeSentiment(topicDf["data.body"])) \
-                        .withColumn("created_utc", from_unixtime(col("data.created_utc").cast(FloatType()))) \
-                        .withColumn("subreddit", col("data.subreddit")) \
-                        .withColumn("submissionid", col("data.submissionID")) \
-                        .withColumn("submissiontitle", col("data.submissionTitle")) \
-                        .withColumn("submissiontitle_sentiment_score", analyzeSentiment(topicDf["data.submissiontitle"])) \
-                        .withColumn("submissionselftext", col("data.submissionSelfText")) \
-                        .withColumn("submissionselftext_sentiment_score", analyzeSentiment(topicDf["data.submissionselftext"])) \
-                        .withColumn("score", col("data.score")) \
-                        .withColumn("submission_tickers", extractTickers(topicDf["data.submissiontitle"], topicDf["data.submissionselftext"], topicDf["data.subreddit"])) \
-                        .drop("data", "key")
+                        exploded_df = writeDf.select(
+                            "*",
+                            explode("submission_tickers").alias("ticker")
+                        )
 
-                    exploded_df = writeDf.select(
-                        "*",
-                        explode("submission_tickers").alias("ticker")
-                    )
+                        exploded_df.write \
+                            .option("failOnDataLoss", "false") \
+                            .options(table="output_data", keyspace=topic) \
+                            .option("checkpointLocation", "/tmp/check_point/") \
+                            .format("org.apache.spark.sql.cassandra") \
+                            .mode("append") \
+                            .save()
 
-                    exploded_df.write \
-                        .option("failOnDataLoss", "false") \
-                        .options(table="output_data", keyspace=topic) \
-                        .option("checkpointLocation", "/tmp/check_point/") \
-                        .format("org.apache.spark.sql.cassandra") \
-                        .mode("append") \
-                        .save()
+            except Exception as e:
+                print(f"Error in writeTopic: {str(e)}")
 
+            finally:
+                print("Completed processing batch")
+    
         kafkaStreamDF.writeStream \
             .trigger(processingTime="15 seconds") \
             .foreachBatch(writeTopic) \

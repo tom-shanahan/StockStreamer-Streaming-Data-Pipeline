@@ -1,5 +1,4 @@
 CREATE KEYSPACE IF NOT EXISTS stockprices WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
-
 use stockprices;
 CREATE TABLE IF NOT EXISTS output_data (
    symbol TEXT, 
@@ -8,11 +7,10 @@ CREATE TABLE IF NOT EXISTS output_data (
    volume DOUBLE, 
    conditions LIST<TEXT>, 
    PRIMARY KEY (symbol, timestamp) 
-) WITH CLUSTERING ORDER BY (timestamp DESC);
+) WITH default_time_to_live = 604800; -- Default TTL of 1 week
 
 
 CREATE KEYSPACE IF NOT EXISTS redditsubmissions WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
-
 use redditsubmissions;
 CREATE TABLE IF NOT EXISTS output_data (
    id text,
@@ -28,11 +26,10 @@ CREATE TABLE IF NOT EXISTS output_data (
    score int,
    created_utc timestamp, 
    submission_tickers list<text>,
-   PRIMARY KEY (ticker, created_utc, id) 
-) WITH CLUSTERING ORDER BY (created_utc DESC, id ASC);
+   PRIMARY KEY ((ticker), created_utc, id)
+) WITH default_time_to_live = 604800; -- Default TTL of 1 week
 
 CREATE KEYSPACE IF NOT EXISTS redditcomments WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
-
 use redditcomments;
 CREATE TABLE IF NOT EXISTS output_data (
    id text,
@@ -48,6 +45,5 @@ CREATE TABLE IF NOT EXISTS output_data (
    submissionselftext_sentiment_score double,
    score int, 
    submission_tickers list<text>,
-   PRIMARY KEY (ticker, created_utc, id) 
-) WITH CLUSTERING ORDER BY (created_utc DESC, id ASC);
-
+   PRIMARY KEY ((ticker), created_utc, id)
+) WITH default_time_to_live = 604800; -- Default TTL of 1 week

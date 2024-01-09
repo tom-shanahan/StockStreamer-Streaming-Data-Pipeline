@@ -8,9 +8,7 @@ import configparser
 subreddit_list = ['stocks','wallstreetbets','investing','StockMarket',
                   'traders','ValueInvesting','StockMarket','finance',
                   'Daytrading','dividends','trading', 'teslamotors',
-                  'TeslaLounge', 'teslainvestorsclub','apple','amazon',
-                  'disney', 'facebook', 'google','intel','Semiconductors',
-                  'microsoft','Nike']
+                  'TeslaLounge', 'teslainvestorsclub','apple','microsoft']
 
 class CommentSubmissionProducer:
 
