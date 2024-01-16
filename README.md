@@ -2,7 +2,7 @@
 
 The Stock Price – Reddit Sentiment Data Pipeline is a streaming data pipeline that collects and processes data from the Finnhub.io and Reddit APIs. This is intended only as a demonstrative project, but it could be used analyze the real-time impact of Reddit comments on stock prices. 
 
-![dashboard_screenshot](https://raw.githubusercontent.com/tom-shanahan/StockStreamer-Streaming-Data-Pipeline/development/images/Screenshot1.png)
+![dashboard_screenshot](https://raw.githubusercontent.com/tom-shanahan/StockStreamer-Streaming-Data-Pipeline/development/images/screenshot1.png)
 
 ## Architecture ##
 
@@ -20,7 +20,7 @@ The above diagram visualizes the pipeline’s structure. The components are cont
 
 5. **Visualizations:** Grafana is used to visualize the processed data stored in the Cassandra cluster. The dashboard displays the sentiment of Reddit comments related to various companies and their real time stock price. 
 
-![dashboard_gif](https://raw.githubusercontent.com/tom-shanahan/StockStreamer-Streaming-Data-Pipeline/development/images/Screenshot2.gif)
+![dashboard_gif](https://raw.githubusercontent.com/tom-shanahan/StockStreamer-Streaming-Data-Pipeline/development/images/screenshot2.gif)
 
 ## Deployment ##
 
