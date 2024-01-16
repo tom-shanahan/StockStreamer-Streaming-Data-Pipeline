@@ -1,0 +1,37 @@
+version: "2.3"
+
+services:
+  stock_price_producer:
+    build:
+      context: ./stock_price_producer
+      dockerfile: Dockerfile
+    container_name: stock_price_producer
+    image: tshanahan/stock_price_producer
+
+  comment_submission_producer:
+    build:
+      context: ./comment_submission_producer
+      dockerfile: Dockerfile
+    container_name: comment_submission_producer
+    image: tshanahan/comment_submission_producer
+
+  spark_structured_streaming:
+    build:
+      context: ./spark_structured_streaming
+      dockerfile: Dockerfile
+    container_name: spark_structured_streaming
+    image: tshanahan/spark_structured_streaming
+
+  cassandra:
+    build:
+      context: ./cassandra
+      dockerfile: Dockerfile
+    container_name: cassandra
+    image: tshanahan/cassandra
+
+  grafana:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile
+    container_name: grafana
+    image: tshanahan/grafana

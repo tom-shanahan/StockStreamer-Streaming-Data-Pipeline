@@ -1,0 +1,17 @@
+{
+	"type": "record",
+	"namespace": "RedditStreamProducer",
+	"name": "submission",
+	"fields": [
+			{"name": "subreddit", 		"type": "string", 	"doc": "Subreddit that the submission belongs to"}, 
+			{"name": "name", 			"type": "string", 	"doc": "Fullname of the submission"}, 
+			{"name": "id", 				"type": "string", 	"doc": "ID of the submission"}, 
+			{"name": "title", 			"type": "string", 	"doc": "The title of the submission"}, 
+			{"name": "selftext", 		"type": "string", 	"doc": "The submissions’ selftext - an empty string if a link post"}, 
+			{"name": "upvote_ratio", 	"type": "float", 	"doc": "The percentage of upvotes from all votes on the submission"}, 
+			{"name": "num_comments", 	"type": "int", 		"doc": "The number of comments on the submission"}, 
+			{"name": "score", 			"type": "int", 		"doc": "The number of upvotes for the submission"}, 
+			{"name": "created_utc", 	"type": "int", 		"doc": "Time the submission was created, represented in Unix Time"}
+		],
+	"doc": "Schema for reddit submission message"
+}
