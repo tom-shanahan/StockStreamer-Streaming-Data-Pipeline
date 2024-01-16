@@ -85,10 +85,23 @@
           },
           "datasourceId": 1,
           "hide": false,
+          "keyspace": "stockprices",
+          "queryType": "query",
+          "rawQuery": true,
+          "refId": "Latest",
+          "target": "SELECT body_sentiment_score AS \"Most Recent\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' \nLIMIT 1;"
+        },
+        {
+          "datasource": {
+            "type": "hadesarchitect-cassandra-datasource",
+            "uid": "PBD6C58217FFECC49"
+          },
+          "datasourceId": 1,
+          "hide": false,
           "keyspace": "redditcomments",
           "queryType": "query",
           "rawQuery": true,
-          "refId": "D",
+          "refId": "ThirtyMin",
           "target": "SELECT AVG(body_sentiment_score) AS \"Prior 30 Minutes\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' AND created_utc > toTimestamp(now()) - 30m;"
         },
         {
@@ -100,7 +113,7 @@
           "keyspace": "redditsubmissions",
           "queryType": "query",
           "rawQuery": true,
-          "refId": "A",
+          "refId": "OneHour",
           "target": "SELECT AVG(body_sentiment_score) AS \"Prior 1 Hour\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' AND created_utc > toTimestamp(now()) - 60m ;"
         },
         {
@@ -113,7 +126,7 @@
           "keyspace": "redditcomments",
           "queryType": "query",
           "rawQuery": true,
-          "refId": "B",
+          "refId": "TwoHour",
           "target": "SELECT AVG(body_sentiment_score) AS \"Prior 2 Hours\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' AND created_utc > toTimestamp(now()) - 120m ;"
         },
         {
@@ -126,7 +139,7 @@
           "keyspace": "redditcomments",
           "queryType": "query",
           "rawQuery": true,
-          "refId": "E",
+          "refId": "FourHour",
           "target": "SELECT AVG(body_sentiment_score) AS \"Prior 4 Hours\"\nFROM redditcomments.output_data\nWHERE ticker = '$selected_ticker' AND created_utc > toTimestamp(now()) - 480m ;"
         }
       ],
@@ -165,7 +178,7 @@
       },
       "hideTimeOverride": true,
       "id": 10,
-      "interval": "10s",
+      "interval": "4s",
       "options": {
         "colorMode": "background",
         "graphMode": "area",
@@ -236,7 +249,7 @@
       },
       "hideTimeOverride": true,
       "id": 11,
-      "interval": "10s",
+      "interval": "4s",
       "options": {
         "colorMode": "background",
         "graphMode": "area",
@@ -475,7 +488,7 @@
       },
       "hideTimeOverride": true,
       "id": 5,
-      "interval": "10s",
+      "interval": "4s",
       "options": {
         "legend": {
           "calcs": [],
@@ -504,7 +517,7 @@
         }
       ],
       "timeFrom": "2h",
-      "title": "Stock Price Plot",
+      "title": "Stock Price",
       "type": "timeseries"
     },
     {
@@ -692,7 +705,7 @@
       },
       "hideTimeOverride": true,
       "id": 6,
-      "interval": "10s",
+      "interval": "4s",
       "options": {
         "legend": {
           "calcs": [],
@@ -728,7 +741,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -736,9 +749,9 @@
     "list": [
       {
         "current": {
-          "selected": true,
-          "text": "TSLA",
-          "value": "TSLA"
+          "selected": false,
+          "text": "MSFT",
+          "value": "MSFT"
         },
         "hide": 0,
         "includeAll": false,
@@ -752,22 +765,17 @@
             "value": "AAPL"
           },
           {
-            "selected": false,
-            "text": "INTC",
-            "value": "INTC"
-          },
-          {
-            "selected": false,
+            "selected": true,
             "text": "MSFT",
             "value": "MSFT"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "TSLA",
             "value": "TSLA"
           }
         ],
-        "query": "AAPL,INTC,MSFT,TSLA",
+        "query": "AAPL,MSFT,TSLA",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"

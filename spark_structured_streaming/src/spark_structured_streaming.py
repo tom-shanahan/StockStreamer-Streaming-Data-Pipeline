@@ -165,7 +165,7 @@ class BatchProcessor:
                 print("Completed processing batch")
     
         kafkaStreamDF.writeStream \
-            .trigger(processingTime="15 seconds") \
+            .trigger(processingTime="4 seconds") \
             .foreachBatch(writeTopic) \
             .start() \
             .awaitTermination()
