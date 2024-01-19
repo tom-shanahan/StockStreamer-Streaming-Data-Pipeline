@@ -1,20 +1,20 @@
 # Stock Price – Reddit Sentiment Data Pipeline #
 
-The Stock Price – Reddit Sentiment Data Pipeline is a streaming data pipeline that collects and processes data from the Finnhub.io and Reddit APIs. This is intended only as a demonstrative project, but it could be used analyze the real-time impact of Reddit comments on stock prices. 
+The Stock Price – Reddit Sentiment Data Pipeline is a streaming data pipeline that collects and processes data from the Finnhub.io and Reddit APIs. This is intended only as a demonstrative project, but it could be used to analyze the real-time impact of Reddit comments on stock prices. 
 
-![dashboard_screenshot](https://raw.githubusercontent.com/tom-shanahan/StockStreamer-Streaming-Data-Pipeline/development/images/screenshot1.png)
+![dashboard_screenshot](https://raw.githubusercontent.com/tom-shanahan/StockStreamer-Streaming-Data-Pipeline/development/images/screenshot3.gif)
 
 ## Architecture ##
 
-**[[Insert diagram]]**
+![architecture_diagram](https://raw.githubusercontent.com/tom-shanahan/StockStreamer-Streaming-Data-Pipeline/development/images/architecture_diagram.jpg)
 
 The above diagram visualizes the pipeline’s structure. The components are containerized into Docker containers. These containers are orchestrated by Kubernetes, with infrastructure managed by Terraform. 
 
-1. **Data Ingestion:** Data is ingested from the Finnhub.io and Reddit APIs by two containerized Python applications, stock_price_producer.py and comment_submission_producer.py. These both receive messages from their respective sources and encode the messages into Avro format. Avro was chosen for its compact and fast binary data format its support of evolutionary schemas. The encoded messages are sent to the Kafka broker.
+1. **Data Ingestion:** Data is ingested from the Finnhub.io and Reddit APIs by two containerized Python applications, stock_price_producer.py and comment_submission_producer.py. These both receive messages from their respective sources and encode the messages into Avro format. Avro was chosen for its compact and fast binary data format and its support of evolutionary schemas. The encoded messages are sent to the Kafka broker.
 
 2. **Message Broker:** Messages from the two producers are received by the Kafka broker (kafkaservice). Messages are grouped by topics, which are initiated by a separated container kafkainit. The metadata for Kafka is managed by Zookeeper. Kafka was chosen for its scalability and reliability. 
 
-3. **Stream Processing:** Data from the Kafka broker is consumed and processed by a Spark application run on the Kubernetes cluster. The PySpark application spark_structured_streaming.py. Consumes the data and processes it. For the Reddit data, the titles and content of the Reddit messages are analyzed for their sentiment and any ticker relevant symbols are extracted. The processed data is them written to Cassandra. Spark was chosen for this role for its scalability and ability to handle high-throughput.
+3. **Stream Processing:** Data from the Kafka broker is consumed and processed by a Spark application run on the Kubernetes cluster. The PySpark application spark_structured_streaming.py. Consumes the data and processes it. For the Reddit data, the titles and content of the Reddit messages are analyzed for their sentiment and any ticker relevant symbols are extracted. The processed data is then written to Cassandra. Spark was chosen for this role for its scalability and ability to handle high-throughput.
 
 4. **Data Storage:** The processed data is stored in a Cassandra cluster. The keyspaces and tables for the data are created by another container, cassandrainit. Cassandra was chosen for its Scalability and Reliability. The keys were structured to be performant for the dashboard queries. 
 
@@ -52,7 +52,7 @@ terraform init
 terraform apply -auto-approve 
 ```
 
-The setup progress can be monitored with the following command:
+The setup progress can be monitored with the following command:
 
 ```
 watch -n 1 kubectl get pods -n data-pipeline
